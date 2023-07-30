@@ -21,6 +21,7 @@ M.setup = function(opts)
         error("find_cmd var is supposed to be a table")
     end
     vim.api.nvim_set_var("tmuxdir_find_cmd", find_cmd)
+    vim.api.nvim_set_var("tmuxdir_version", "1.0.0")
 end
 
 M.sessions = function(opts)
