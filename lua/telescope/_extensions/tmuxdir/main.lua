@@ -15,6 +15,12 @@ M.setup = function(opts)
         error("base_dirs var is supposed to be a table")
     end
     vim.api.nvim_set_var("tmuxdir_base_dirs", base_dirs)
+
+    local find_cmd = opts["find_cmd"] or {"fd", "-HI", "^.git$", "-d", "2"}
+    if type(find_cmd) ~= "table" then
+        error("find_cmd var is supposed to be a table")
+    end
+    vim.api.nvim_set_var("tmuxdir_find_cmd", find_cmd)
 end
 
 M.sessions = function(opts)
@@ -77,8 +83,14 @@ M.dirs = function(opts)
 
     local results = {}
     local base_dirs = vim.api.nvim_get_var("tmuxdir_base_dirs")
+    local find_cmd = vim.api.nvim_get_var("tmuxdir_find_cmd")
+    -- make a copy of cmd since get_os_command_output mutates it
+    local cmd = {}
+    for _i, v in ipairs(find_cmd) do
+        table.insert(cmd, v)
+    end
     for _i, base_dir in ipairs(base_dirs) do
-        for _j, dir in ipairs(utils.find_git_repos(utils.ensures_trailing_sep(base_dir))) do
+        for _j, dir in ipairs(utils.find_git_repos(cmd, utils.ensures_trailing_sep(base_dir))) do
             table.insert(results, dir)
         end
     end
